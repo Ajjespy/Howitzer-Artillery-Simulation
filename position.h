@@ -33,7 +33,6 @@ public:
    Position(const Position & pt) : x(pt.x), y(pt.y) {}
    Position& operator = (const Position& pt);
 
-
    // getters
    Position getReverse() { return Position(y, x); };
    double getMetersX()       const { return x;                    }
