@@ -1,8 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\problemsets"
+    "\\problemsets",
+    "\\problemsets\\10 - test cases",
+    "\\problemsets\\chess",
+    "\\problemsets\\chess\\10 - TDD"
   ],
-  "SelectedNode": "\\problemsets",
+  "SelectedNode": "\\problemsets\\chess\\10 - TDD\\10 - TDD.cpp",
   "PreviewInSolutionExplorer": false
 }
