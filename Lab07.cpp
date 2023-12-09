@@ -17,6 +17,7 @@
 #include "ground.h"     // for GROUND
 #include "position.h"   // for POSITION
 #include "bulletPhysics.h"
+#include <queue>
 using namespace std;
 
 /*************************************************************************
@@ -49,7 +50,7 @@ public:
    }
 
    Ground ground;                 // the ground
-   //Position  projectilePath[20];  // path of the projectile
+   queue<Position> projectilePath;  // path of the projectile  
    Position  ptHowitzer;          // location of the howitzer
    Position  ptUpperRight;        // size of the screen
    physics   bullet;
@@ -68,7 +69,7 @@ void callBack(const Interface* pUI, void* p)
    // the first step is to cast the void pointer into a game object. This
    // is the first step of every single callback function in OpenGL. 
    Demo* pDemo = (Demo*)p;
-   ogstream gout(Position(510.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
+   ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
    
    // fire that gun, start the simulation
    if (pUI->isSpace())
@@ -78,8 +79,8 @@ void callBack(const Interface* pUI, void* p)
    if (pDemo->active)
    {
        
-       pDemo->bullet.move(); 
-       if (pDemo->bullet.getPosition().getMetersY() > pDemo->ground.getElevationMeters(pDemo->bullet.getPosition()))
+        
+       if (pDemo->bullet.getPosition().getMetersY() >= pDemo->ground.getElevationMeters(pDemo->bullet.getPosition()))
        {
            pDemo->bullet.move();
 
@@ -88,11 +89,23 @@ void callBack(const Interface* pUI, void* p)
 
            // draw the howitzer
            gout.drawHowitzer(pDemo->ptHowitzer, pDemo->bullet.getAngle(), pDemo->bullet.getTime());
-
+            if (pDemo->projectilePath.size() <= 20)
+            {
+                pDemo->projectilePath.push(pDemo->bullet.getPosition());
+            }
+            else
+            {
+                pDemo->projectilePath.pop();
+                pDemo->projectilePath.push(pDemo->bullet.getPosition());
+            }
            // draw the projectile
-           //for (int i = 0; i < 20; i++)
-              //gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
-           gout.drawProjectile(pDemo->bullet.getPosition());
+           queue<Position> temp = pDemo->projectilePath;
+           while (!temp.empty()) 
+           {
+               gout.drawProjectile(temp.front(), 0.5 * (double)(0.5 * temp.size()));
+               temp.pop();
+           }
+
 
            // draw some text on the screen
 
@@ -112,11 +125,24 @@ void callBack(const Interface* pUI, void* p)
        {
            pDemo->bullet.hitGround(pDemo->ground.getElevationMeters(pDemo->bullet.pointOfImpactX()));
            pDemo->active = false;
+           pDemo->projectilePath.push(pDemo->bullet.getPosition());
+           //empty queue
+           while (! pDemo->projectilePath.empty())
+           {
+               queue<Position> temp = pDemo->projectilePath;
+               while (! temp.empty())
+               {
+                   gout.drawProjectile(temp.front(), 0.5 * (double)(0.5 * temp.size()));
+                   temp.pop();
+               }
+               pDemo->projectilePath.pop();
+           }
        }
         
    }
    else
    {
+       //move a lot
        if (pUI->isRight())
            {
                pDemo->bullet.changeAngle(0.05);
@@ -124,20 +150,20 @@ void callBack(const Interface* pUI, void* p)
            }
        if (pUI->isLeft())
            {
-           pDemo->bullet.changeAngle(-0.05);
-           pDemo->bullet.reset(pDemo->ptHowitzer);
+               pDemo->bullet.changeAngle(-0.05);
+               pDemo->bullet.reset(pDemo->ptHowitzer);
            }
 
        // move by a little
        if (pUI->isUp())
            {
-           pDemo->bullet.changeAngle(0.003);
-           pDemo->bullet.reset(pDemo->ptHowitzer);
+               pDemo->bullet.changeAngle(0.003);
+               pDemo->bullet.reset(pDemo->ptHowitzer);
            }
        if (pUI->isDown())
            {
-           pDemo->bullet.changeAngle(-0.003);
-           pDemo->bullet.reset(pDemo->ptHowitzer);
+               pDemo->bullet.changeAngle(-0.003);
+               pDemo->bullet.reset(pDemo->ptHowitzer);
            }
 
    // move the projectile across the screen
