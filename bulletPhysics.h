@@ -8,8 +8,20 @@ using namespace std;
 class physics
 {
 public:
-   physics()         : current(), dx(0.0), dy(0.0), angle(0.0), t(0.01), ddx(0.0), ddy(0.0), v(827.0), s(0.0), area(0.0188424), dragf(0.0), WIGHT(46.7)  {}
-   physics(Position start, double angle);
+   physics()         : current(), last(), dx(0.0), dy(0.0), angle(0.0), t(0.5), ddx(0.0), ddy(0.0), v(827.0), s(0.0), area(0.0188424), dragf(0.0), WEIGHT(46.7), bulletAngle(0.0){}
+   physics(Position start, double angle): current(start), last(), dx(0.0), dy(0.0), angle(angle), t(0.5), ddx(0.0), ddy(0.0), v(827.0), s(0.0), area(0.0188424), dragf(0.0), WEIGHT(46.7), bulletAngle(0.0){}
+   void setPosition(Position pos);
+   void changeAngle(double change);
+   double getAngle();
+   double getBulletAngle();
+   Position getPosition();
+   void move();
+   double getTime();
+   void hitGround(double elevation);
+   Position pointOfImpactX();
+   void reset(Position pos);
+   double getDistance(Position pos);
+   double getSpeed();
 
 private:
    double horizontalComponent(double angle, double total);
@@ -25,9 +37,11 @@ private:
    double pointfinder(const Position data[], double value);
 
    Position current ;
+   Position last;
    double dx ;
    double dy ;
    double angle ;
+   double bulletAngle;
    double t ;               //time interval
    double ddx;                 // Total horizontal acceleration
    double ddy;                 // Total vertical acceleration
@@ -111,26 +125,24 @@ private:
     Position(20000.0,	-9.745),
     Position(25000.0,	-9.730)};
 
-    int main()
+    /*int main()
 {
-    // Prompt for input and variables to be computed
     double dx ;
     double dy ;
     double x = 0.0;
     double angle = 75.0;
     double t = .01;               //time interval
-    double aRadians = degreestoRadians(angle);            // Angle in radians
     double ddx;                 // Total horizontal acceleration
     double ddy;                 // Total vertical acceleration
     double v = 827.0;                   // Total velocity
     double s = 0.0;                   // seconds passed
-    double area = circleArea(DIAMETER / 2);
+    double area;
     double dragf;
     Position current;
     Position last;
 
-    dx = horizontalComponent(aRadians, v); 
-    dy = verticalComponent(aRadians, v);  
+    dx = horizontalComponent(angle, v);  
+    dy = verticalComponent(angle, v);   
 
 
     
@@ -138,10 +150,10 @@ private:
     {
         last = current;
         v = pythagoreanTheorem(dx, dy); 
-        aRadians = anglefromComponents(dx, dy); 
+        angle = anglefromComponents(dx, dy); 
         dragf = dragForce(pointfinder(drag, (v / pointfinder(sound, current.getMetersY()))), pointfinder(density, current.getMetersY()), v, area);
-        ddx = horizontalComponent(aRadians, dragf);
-        ddy = pointfinder(gravity, current.getMetersY()) + verticalComponent(aRadians, dragf);
+        ddx = horizontalComponent(angle , dragf);
+        ddy = pointfinder(gravity, current.getMetersY()) + verticalComponent(angle, dragf);
         dx = computeVelocity(dx, ddx, t); 
         dy = computeVelocity(dy, ddy, t);
         current.setMetersX(ComputeDistance(current.getMetersX(), dx, ddx, t));
@@ -155,6 +167,7 @@ private:
     cout.precision(1);
     cout << "Distance : " << x << "m  Hangtime: " << s << "s\n";
 
-   }
-};
+   }*/
+}; 
+
 

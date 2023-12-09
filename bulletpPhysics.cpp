@@ -1,16 +1,105 @@
 /***********************************************************************
- * Source File:
- *    Point : The representation of a position on the screen
- * Author:
- *    Br. Helfrich
- * Summary:
- *    Everything we need to know about a location on the screen.
+ 
  ************************************************************************/
 
 #include "bulletPhysics.h"
 
 using namespace std;
 
+void physics::setPosition(Position pos)
+{
+    current = pos;
+}
+
+void physics::changeAngle(double change)
+{
+    //keep angle between 0 and 360
+    double pi = 22.0 / 7.0;
+    angle += change;
+    if (angle >= pi)
+        angle -= 2 * pi;
+    if (angle < -pi)
+        angle += 2 * pi;
+}
+
+double physics::getAngle()
+{
+    return angle;
+}
+
+Position physics::getPosition()
+{
+    return current;
+}
+
+double physics::getTime()
+{
+    return s;
+}
+
+double physics::getBulletAngle()
+{
+    return bulletAngle;
+}
+
+void physics::hitGround(double elevation)
+{
+    current.setMetersX(linearInterpolation(current.getReverse(), last.getReverse(), elevation));
+    current.setMetersY(elevation);
+}
+
+Position physics::pointOfImpactX()
+{
+    return Position(((current.getMetersX() + last.getMetersX()) / 2.0), 0.0);
+}
+
+double physics::getDistance(Position pos)
+{
+    double difference = current.getMetersX() - pos.getMetersX();
+    if (difference < 0.0)
+    {
+        difference *= -1.0;
+    }
+    return difference;
+}
+
+double physics::getSpeed()
+{
+    return v;
+}
+
+void physics::reset(Position pos)
+{
+    current = pos; 
+    dx = 0.0;
+    dy = 0.0;
+    ddx = 0.0;
+    ddy = 0.0;
+    v = 827.0; 
+    s = 0.0;
+}
+
+void physics::move()
+{
+    
+    if (s == 0.0)
+    {
+        bulletAngle = angle;
+        dx = horizontalComponent(bulletAngle, v);
+        dy = verticalComponent(bulletAngle, v);
+    }
+    last = current;
+    dragf = dragForce(pointfinder(drag, (v / pointfinder(sound, current.getMetersY()))), pointfinder(density, current.getMetersY()), v, area);
+    ddx = horizontalComponent(bulletAngle, dragf);
+    ddy = pointfinder(gravity, current.getMetersY()) + verticalComponent(bulletAngle, dragf);
+    dx = computeVelocity(dx, ddx, t);
+    dy = computeVelocity(dy, ddy, t);
+    v = pythagoreanTheorem(dx, dy);
+    bulletAngle = anglefromComponents(dx, dy); 
+    current.setMetersX(ComputeDistance(current.getMetersX(), dx, ddx, t));
+    current.setMetersY(ComputeDistance(current.getMetersY(), dy, ddy, t));
+    s += t;
+}
 /***********************************************
  * COMPUTE HORIZONTAL COMPONENT
  * Find the horizontal component of a velocity or acceleration.
