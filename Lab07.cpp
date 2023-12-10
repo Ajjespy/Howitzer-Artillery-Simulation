@@ -1,14 +1,15 @@
 /*************************************************************
  * 1. Name:
- *      The Key
+ *      Austin Jesperson
+ *      Brighton Gold
  * 2. Assignment Name:
- *      Lab 08: M777 Howitzer
+ *      M777 Howitzer Final Code
  * 3. Assignment Description:
  *      Simulate firing the M777 howitzer 15mm artillery piece
  * 4. What was the hardest part? Be as specific as possible.
- *      ??
+ *      moving the calculations into the simlation
  * 5. How long did it take for you to complete the assignment?
- *      ??
+ *      4 hours
  *****************************************************************/
 
 #include <cassert>      // for ASSERT
@@ -137,6 +138,15 @@ void callBack(const Interface* pUI, void* p)
                }
                pDemo->projectilePath.pop();
            }
+           //check if the target is hit
+           //cout << computeDistance(pDemo->bullet.getPosition(), pDemo->ground.getTarget()) << endl;
+           if (computeDistance(pDemo->bullet.getPosition(), pDemo->ground.getTarget()) <= 200.0)
+           {
+               pDemo->ptHowitzer.setPixelsX(random(150.0, Position(pDemo->ptUpperRight).getPixelsX() - 150.0));
+               pDemo->ground.reset(pDemo->ptHowitzer);
+               pDemo->ptHowitzer.setMetersY(pDemo->ground.getElevationMeters(pDemo->ptHowitzer));
+               pDemo->bullet.reset(pDemo->ptHowitzer); 
+           }
        }
         
    }
@@ -166,22 +176,10 @@ void callBack(const Interface* pUI, void* p)
                pDemo->bullet.reset(pDemo->ptHowitzer);
            }
 
-   // move the projectile across the screen
-   /*for (int i = 0; i < 20; i++)
-   {
-      // this bullet is moving left at 1 pixel per frame
-      double x = pDemo->projectilePath[i].getPixelsX();
-      x -= 1.0;
-      if (x < 0)
-         x = pDemo->ptUpperRight.getPixelsX();
-      pDemo->projectilePath[i].setPixelsX(x);
-   }*/
 
    //
    // draw everything
    //
-
-      
 
        // draw the ground first
        pDemo->ground.draw(gout);
