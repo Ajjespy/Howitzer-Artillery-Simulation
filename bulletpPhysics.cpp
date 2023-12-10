@@ -11,6 +11,13 @@ void physics::setPosition(Position pos)
     current = pos;
 }
 
+double physics::getAngleDegrees()
+{
+    double pi = 22.0 / 7.0; 
+    double a = angle / (2 * pi) * 360;
+    return a; 
+}
+
 void physics::changeAngle(double change)
 {
     //keep angle between 0 and 360

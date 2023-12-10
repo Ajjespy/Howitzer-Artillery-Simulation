@@ -31,7 +31,8 @@ public:
     Demo(Position ptUpperRight) :
         ptUpperRight(ptUpperRight),
         ground(ptUpperRight),
-        active(false)
+        active(false),
+        ptText(ptUpperRight)
    {
       // Set the horizontal position of the howitzer. This should be random.
       ptHowitzer.setPixelsX(random(150.0, Position(ptUpperRight).getPixelsX() - 150.0));
@@ -40,6 +41,8 @@ public:
       ground.reset(ptHowitzer);
       ptHowitzer.setMetersY(ground.getElevationMeters(ptHowitzer));
       bullet.setPosition(Position(ptHowitzer.getMetersX(), ground.getElevationMeters(ptHowitzer)));
+      ptText.addPixelsX(-130);
+      ptText.addPixelsY(-20);
       // This is to make the bullet travel across the screen. Notice how there are 
       // 20 pixels, each with a different age. This gives the appearance
       // of a trail that fades off in the distance.
@@ -55,6 +58,7 @@ public:
    Position  ptHowitzer;          // location of the howitzer
    Position  ptUpperRight;        // size of the screen
    physics   bullet;
+   Position  ptText;
    bool active;
 };
 
@@ -112,6 +116,7 @@ void callBack(const Interface* pUI, void* p)
 
            gout.setf(ios::fixed | ios::showpoint);
            gout.precision(1);
+           gout.setPosition(pDemo->ptText);
            gout << "altitude: "
                << pDemo->bullet.getPosition().getMetersY() - pDemo->ground.getElevationMeters(pDemo->bullet.getPosition())
                << "m\nspeed: " 
@@ -127,6 +132,7 @@ void callBack(const Interface* pUI, void* p)
            pDemo->bullet.hitGround(pDemo->ground.getElevationMeters(pDemo->bullet.pointOfImpactX()));
            pDemo->active = false;
            pDemo->projectilePath.push(pDemo->bullet.getPosition());
+
            //empty queue
            while (! pDemo->projectilePath.empty())
            {
@@ -176,11 +182,6 @@ void callBack(const Interface* pUI, void* p)
                pDemo->bullet.reset(pDemo->ptHowitzer);
            }
 
-
-   //
-   // draw everything
-   //
-
        // draw the ground first
        pDemo->ground.draw(gout);
 
@@ -195,8 +196,9 @@ void callBack(const Interface* pUI, void* p)
        // draw some text on the screen
        gout.setf(ios::fixed | ios::showpoint);
        gout.precision(1);
+       gout.setPosition(pDemo->ptText);
        gout << "Angle: "
-           << pDemo->bullet.getAngle() << " Degrees    ";
+           << pDemo->bullet.getAngleDegrees() << " Degrees    "; 
    }
 
    

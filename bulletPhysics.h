@@ -22,6 +22,7 @@ public:
    void reset(Position pos);
    double getDistance(Position pos);
    double getSpeed();
+   double getAngleDegrees();
 
 private:
    double horizontalComponent(double angle, double total);
